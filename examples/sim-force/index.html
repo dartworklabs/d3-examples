@@ -13,6 +13,8 @@
 <svg></svg>
 <br/>
 <button id="download">그래프 다운로드</button>
+<script id="sim-data" type="application/json"></script>
+<script id="ts-data" type="application/json"></script>
 <script>
 
 let colors = d3.scaleOrdinal(d3.schemeCategory10);
@@ -47,6 +49,31 @@ colors = [
     "#3B82F6", // 파랑
     "#A855F7", // 보라
 ];
+
+function getEmbeddedJson(id) {
+    const el = document.getElementById(id);
+    if (!el) return null;
+    const text = (el.textContent || '').trim();
+    if (!text) return null;
+    try {
+        return JSON.parse(text);
+    } catch (e) {
+        console.error(`[${id}] JSON 파싱 오류:`, e);
+        return null;
+    }
+}
+
+function loadData() {
+    const embeddedSim = getEmbeddedJson('sim-data');
+    const embeddedTs = getEmbeddedJson('ts-data');
+    if (embeddedSim && embeddedTs) {
+        return Promise.resolve([embeddedSim, embeddedTs]);
+    }
+    return Promise.all([
+        d3.json('../../assets/similarities.json'),
+        d3.json('../../assets/ts-2009-2010-3m.json')
+    ]);
+}
 
 let svg = d3.select('body svg')
     // .append('svg')
@@ -643,10 +670,7 @@ function redraw(targetBid, data) {
     draw(targetBid, data);
 }
 
-Promise.all([
-    d3.json('../../assets/similarities.json'),
-    d3.json('../../assets/ts-2009-2010-3m.json')
-]).then(([simData, tsData]) => {
+loadData().then(([simData, tsData]) => {
     console.log('Data loaded');
 
     let targetBid = "4";
