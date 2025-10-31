@@ -12,7 +12,7 @@
 <body>
 <svg></svg>
 <br/>
-<button id="download">그래프 다운로드</button>
+<!-- <button id="download">그래프 다운로드</button> -->
 <script id="sim-data" type="application/json"></script>
 <script id="ts-data" type="application/json"></script>
 <div id="local-loader" style="display:none; margin-top:8px;">
@@ -268,7 +268,7 @@ function drawTsList() {
         .attr('x', g2Width / 2)
         .attr('y', tsHeight + 32)
         .attr('fill', '#000')
-        .attr('font-size', 14)
+        .attr('font-size', 13)
         .text('Time [h]')
     ;
 
@@ -284,7 +284,7 @@ function drawTsList() {
         .attr('text-anchor', 'middle')
         .attr('y', -35)
         .attr('fill', '#000')
-        .attr('font-size', 14)
+        .attr('font-size', 13)
         .attr('transform', 'rotate(-90)')
         .text('Normalized electricity usage') // 줄바꿈으로 나누기
         .attr('x', () => {
