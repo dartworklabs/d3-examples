@@ -454,7 +454,8 @@ function draw(targetBid, data) {
             if (event.target.id.split('-')[1] === targetBid)
                 return;
 
-            let dist = 1000*d.similarity > 10 ? (1000*d.similarity).toFixed(1) : (1000*d.similarity).toFixed(2);
+            const formatDist = d3.format(".3g");
+            const dist = formatDist(d.similarity);
             // Add tooltip.
             tooltip
                 .style("display", "block")
@@ -462,10 +463,15 @@ function draw(targetBid, data) {
                 .attr("x", d.x)
                 .attr("y", d.y)
 
+            // Resize tooltip background to fit text
+            const bbox = tooltip.node().getBBox();
+            const padX = 6, padY = 4;
             tooltipRect
                 .style("display", "block")
-                .attr("x", d.x)
-                .attr("y", d.y)
+                .attr("x", d.x - padX)
+                .attr("y", d.y - bbox.height - padY + 3)
+                .attr("width", bbox.width + 2 * padX)
+                .attr("height", bbox.height + 2 * padY)
 
             console.log(d.similarity);
         })
@@ -474,9 +480,13 @@ function draw(targetBid, data) {
                 .attr("x", event.x)
                 .attr("y", event.y)
 
+            const bbox = tooltip.node().getBBox();
+            const padX = 6, padY = 4;
             tooltipRect
-                .attr("x", event.x - 5)
-                .attr("y", event.y - 18.5)
+                .attr("x", event.x - padX)
+                .attr("y", event.y - bbox.height - padY + 3)
+                .attr("width", bbox.width + 2 * padX)
+                .attr("height", bbox.height + 2 * padY)
         })
         .on("mouseout", () => {
             tooltip.style("display", "none");
@@ -570,8 +580,8 @@ function draw(targetBid, data) {
         .attr("y", 0)
         .attr('rx', 5)
         .attr('ry', 5)
-        .attr("width", 77)
-        .attr("height", 25)
+        .attr("width", 0)
+        .attr("height", 0)
         .attr("fill", "#374151")
         .attr('opacity', 0.6)
         .style("display", "none")
