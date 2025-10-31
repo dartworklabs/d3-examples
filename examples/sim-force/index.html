@@ -36,6 +36,8 @@ let height = g1Height + margin.top + margin.bottom;
 
 let selectedIndices = [];
 
+let tsTargetIndex = null; // target time-series index for title labeling
+
 let grayColor = '#6b7280';
 
 colors = [
@@ -115,7 +117,7 @@ function drawTsList() {
     // ;
 
     let xscale = d3.scaleLinear()
-        .domain([0, 1000])
+        .domain([0, 500])
         .range([0, g2Width])
     ;
 
@@ -127,10 +129,25 @@ function drawTsList() {
     let xaxis = d3.axisBottom(xscale)
         .tickSize(2.5)
         .tickFormat(d3.format('d'))
-        .tickValues([0, 250, 500, 750, 1000])
+        .tickValues([0, 100, 200, 300, 400, 500])
     ;
+    // series title (left-top): Target -> "B{bid}: Target", others -> "B{bid}"
+    sub.selectAll('text.series-title').remove();
+    sub.append('text')
+        .attr('class', 'series-title')
+        .attr('x', 4) // 4px 오른쪽
+        .attr('y', 4) // 4px 아래
+        .attr('text-anchor', 'start')
+        .attr('dominant-baseline', 'hanging')
+        // .attr('fill', (d, i) => colors[i])
+        .attr('font-size', 12)
+        // .attr('font-weight', (d) => d === tsTargetIndex ? 'bold' : 'normal')
+        .text((d) => d === tsTargetIndex ? `Target: B${data[d].bid}` : `B${data[d].bid}`)
+    ;
+
     let yaxis = d3.axisLeft(yscale)
-        .tickValues([-1, 0, 1])
+        .tickValues([1, 0, -1])
+        .tickFormat(d3.format('d'))
         .tickSize(2.5)
         .tickSizeOuter(0)
     ;
@@ -164,7 +181,10 @@ function drawTsList() {
     sub.append('path')
         .attr('class', 'line')
         .transition()
-        .attr('d', (d, i) => line(data[d].ts))
+        .attr('d', (d, i) => {
+            const windowed = data[d].ts.slice(200, 701);
+            return line(windowed);
+        })
         .attr('fill', 'none')
         .attr('stroke', (d, i) => colors[i])
         .attr('stroke-width', 1)
@@ -177,9 +197,9 @@ function drawTsList() {
         .attr('text-anchor', 'middle')
         .attr('x', g2Width / 2)
         .attr('y', tsHeight + 32)
-        .attr('fill', grayColor)
-        .attr('font-size', 12)
-        .text('Time [hour]')
+        .attr('fill', '#000')
+        .attr('font-size', 14)
+        .text('Time [h]')
     ;
 
     let targetAxes = Math.floor(selectedIndices.length / 2);
@@ -192,9 +212,9 @@ function drawTsList() {
         .append('text')
         .attr('id', 'y-axis-label')
         .attr('text-anchor', 'middle')
-        .attr('y', -50)
-        .attr('fill', grayColor)
-        .attr('font-size', 12)
+        .attr('y', -35)
+        .attr('fill', '#000')
+        .attr('font-size', 14)
         .attr('transform', 'rotate(-90)')
         .text('Normalized electricity usage') // 줄바꿈으로 나누기
         .attr('x', () => {
@@ -228,25 +248,27 @@ function drawTsList() {
     //  틱 두께 조정.
     sub.selectAll('.x-axis .tick line')
         .attr('stroke-width', 0.5)
-        .attr('stroke', grayColor)
+        .attr('stroke', '#000')
 
     sub.selectAll('.x-axis .domain')
         .attr('stroke-width', 0.5)
-        .attr('stroke', grayColor)
+        .attr('stroke', '#000')
 
     sub.selectAll('.y-axis .tick line')
         .attr('stroke-width', 0.5)
-        .attr('stroke', grayColor)
+        .attr('stroke', '#000')
 
     sub.selectAll('.y-axis .domain')
         .attr('stroke-width', 0.5)
-        .attr('stroke', grayColor)
+        .attr('stroke', '#000')
 
     sub.selectAll('.x-axis .tick text')
-        .attr('color', grayColor)
+        .attr('fill', '#000')
+        .style('font-size', '12px')
 
     sub.selectAll('.y-axis .tick text')
-        .attr('color', grayColor)
+        .attr('fill', '#000')
+        .style('font-size', '12px')
 
     // sub.selectAll('.ts')
     //     // .data([1])
@@ -317,6 +339,7 @@ function createNodesAndLinks(data, targetBid) {
 
 function draw(targetBid, data) {
     let [nodes, links, targetIndex] = createNodesAndLinks(data, targetBid);
+    tsTargetIndex = targetIndex;
 
     let simX = g1Width / 2;
     let simY = g1Height / 2;
@@ -626,7 +649,7 @@ Promise.all([
 ]).then(([simData, tsData]) => {
     console.log('Data loaded');
 
-    let targetBid = "0";
+    let targetBid = "4";
     data = preprocessData(targetBid, simData, tsData);
 
     draw(targetBid, data);
