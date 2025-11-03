@@ -500,15 +500,18 @@ function draw(targetBid, data) {
             console.log(d.similarity);
         })
         .on("mousemove", (event) => {
+            var [px, py] = d3.pointer(event, svg.node());
+            px += 10;
+            py += 20;
             tooltip
-                .attr("x", event.x)
-                .attr("y", event.y)
+                .attr("x", px)
+                .attr("y", py)
 
             const bbox = tooltip.node().getBBox();
             const padX = 6, padY = 4;
             tooltipRect
-                .attr("x", event.x - padX)
-                .attr("y", event.y - bbox.height - padY + 3)
+                .attr("x", px - padX)
+                .attr("y", py - bbox.height - padY + 3)
                 .attr("width", bbox.width + 2 * padX)
                 .attr("height", bbox.height + 2 * padY)
         })
