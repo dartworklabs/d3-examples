@@ -505,9 +505,12 @@ function draw(targetBid, data) {
             if (d.index === targetIndex)
                 return;
 
-            // selectedIndices에 없으면 추가 있으면 삭제.
+            // selectedIndices에 없으면 추가, 있으면 삭제. 최대 5개 제한.
             const index = selectedIndices.indexOf(d.index);
             if (index === -1) {
+                if (selectedIndices.length >= 5) {
+                    return; // 최대 개수 초과 시 추가하지 않음
+                }
                 selectedIndices.push(d.index);
                 // selectedIndices.sort((a, b) => a - b);
             } else {
