@@ -8,6 +8,14 @@
         body {
             font-family: 'Roboto', sans-serif;
         }
+        /* shadcn/ui 유사 셀렉트 & 버튼 스타일 */
+        .ui-controls { display: flex; align-items: center; gap: 8px; margin: 8px 0; }
+        .ui-label { font-size: 14px; color: #111827; }
+        .ui-select { appearance: none; padding: 6px 28px 6px 10px; border: 1px solid #E5E7EB; border-radius: 6px; background: white; color: #111827; font-size: 14px; line-height: 20px; position: relative; }
+        .ui-select:focus { outline: none; border-color: #3B82F6; box-shadow: 0 0 0 4px rgba(59,130,246,0.15); }
+        .ui-button { padding: 6px 12px; border: 1px solid #111827; background: #111827; color: white; border-radius: 6px; font-size: 14px; }
+        .ui-button:hover { background: #0B1220; }
+        .ui-button:disabled { opacity: 0.6; cursor: not-allowed; }
     </style>
 </head>
 <body>
@@ -693,27 +701,43 @@ function preprocessData(targetBid, simData, tsData) {
     return data;
 }
 
-// Add input for target bid.
-function createButton(data, simData, tsData) {
-    // New line  추가.
-    document.body.appendChild(document.createElement('br'));
-    let input = document.createElement('input');
-    input.type = 'text';
-    input.value = '0';
-    document.body.appendChild(input);
+// 타깃 빌딩 선택 콤보박스 + 버튼 생성
+function createTargetSelector(currentBid, simData, tsData) {
+    const bids = Object.keys(simData).sort((a, b) => (+a) - (+b));
 
-    let button = document.createElement('button');
-    button.textContent = 'Submit';
-    document.body.appendChild(button);
+    const controls = document.createElement('div');
+    controls.className = 'ui-controls';
 
-    button.addEventListener('click', () => {
-        let targetBid = input.value;
-        console.log(targetBid);
+    const label = document.createElement('label');
+    label.className = 'ui-label';
+    label.textContent = 'Target building';
+    label.setAttribute('for', 'target-select');
 
-        // Remove previous data.
+    const select = document.createElement('select');
+    select.id = 'target-select';
+    select.className = 'ui-select';
+    bids.forEach((bid) => {
+        const opt = document.createElement('option');
+        opt.value = bid;
+        opt.textContent = `B${bid}`;
+        if (bid === currentBid) opt.selected = true;
+        select.appendChild(opt);
+    });
+
+    const applyBtn = document.createElement('button');
+    applyBtn.className = 'ui-button';
+    applyBtn.textContent = '변경';
+
+    applyBtn.addEventListener('click', () => {
+        const targetBid = select.value;
         data = preprocessData(targetBid, simData, tsData);
         redraw(targetBid, data);
     });
+
+    controls.appendChild(label);
+    controls.appendChild(select);
+    controls.appendChild(applyBtn);
+    document.body.insertBefore(controls, document.body.children[1]);
 }
 
 function redraw(targetBid, data) {
@@ -735,7 +759,7 @@ loadData().then(([simData, tsData]) => {
 
     draw(targetBid, data);
 
-    // createButton(data, simData, tsData);
+    createTargetSelector(targetBid, simData, tsData);
 
     // console.log(simData);
     // console.log(tsData);
