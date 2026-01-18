@@ -131,6 +131,24 @@
             background-repeat: no-repeat;
             background-size: 1.5em 1.5em;
         }
+
+        /* Node Interaction Styles */
+        .node-circle {
+            cursor: pointer;
+            transform-box: fill-box;
+            transform-origin: center;
+            transition: transform 0.1s ease, stroke-width 0.1s ease;
+        }
+
+        .node-circle:hover {
+            stroke: #111827;
+            stroke-width: 1.0px;
+        }
+
+        .node-circle:active {
+            transform: scale(0.9);
+            stroke-width: 1px;
+        }
     </style>
 </head>
 
