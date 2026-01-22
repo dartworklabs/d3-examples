@@ -8,6 +8,16 @@
     <style>
         body {
             font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            width: 100vw;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #f9fafb;
+            overflow: hidden;
+            /* Prevent scrollbars */
         }
 
         /* shadcn/ui 유사 셀렉트 & 버튼 스타일 */
@@ -19,7 +29,7 @@
         }
 
         .ui-label {
-            font-size: 15.5px;
+            font-size: 16px;
             color: #111827;
         }
 
@@ -65,8 +75,12 @@
             border-radius: 12px;
             background: #FFFFFF;
             box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
-            max-width: fit-content;
-            margin: 24px auto;
+            /* max-width: fit-content; REMOVE */
+            /* margin: 24px auto; REMOVE */
+            width: 95vw;
+            height: 95vh;
+            display: flex;
+            flex-direction: column;
         }
 
         .card-header {
@@ -106,9 +120,15 @@
         .card-content {
             padding: 16px;
             width: 100%;
-            box-sizing: border-box;
+            /* box-sizing: border-box; */
             display: flex;
             justify-content: center;
+            align-items: center;
+            /* 수직 중앙 정렬 추가 */
+            flex: 1;
+            /* 남은 높이 차지 */
+            overflow: hidden;
+            /* 내부 스크롤 방지 */
         }
 
         /* content centering */
@@ -277,8 +297,12 @@
 
         let svg = d3.select('#graph-svg')
             // .append('svg')
-            .attr('width', width)
-            .attr('height', height);
+            .attr('viewBox', `0 0 ${width} ${height}`)
+            .attr('preserveAspectRatio', 'xMidYMid meet')
+            .style('width', '100%')
+            .style('height', '100%');
+        // .attr('width', width)
+        // .attr('height', height);
 
         // svg.append('rect')
         //     .attr('width', width)
