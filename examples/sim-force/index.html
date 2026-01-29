@@ -75,10 +75,16 @@
             border-radius: 12px;
             background: #FFFFFF;
             box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
-            width: 98vw;
-            height: 98vh;
-            display: flex;
+            /* width: 98vw; -> Removed to allow shrink wrap */
+            width: auto;
+            display: inline-flex;
             flex-direction: column;
+
+            /* Height constraint */
+            height: 95vh;
+            /* Prevent overflowing viewport width on small screens */
+            max-width: 98vw;
+
             position: relative;
         }
 
@@ -183,8 +189,8 @@
         <div id="slider-container"
             style="display:none; position:absolute; top:80px; left:50%; transform:translate(-50%, 0); background:white; padding:12px; border:1px solid #e5e7eb; border-radius:8px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); z-index:1000; display: flex; align-items: center; gap: 10px;">
             <label style="font-size: 14px; font-weight: 500; color: #374151;">Ratio (F:TS): <span
-                    id="ratio-val">1.0</span></label>
-            <input type="range" id="ratio-slider" min="0.5" max="2.0" step="0.1" value="1.0" style="width: 150px;">
+                    id="ratio-val">1.1</span></label>
+            <input type="range" id="ratio-slider" min="0.5" max="2.0" step="0.1" value="1.1" style="width: 150px;">
         </div>
         <div class="card-content">
             <svg id="graph-svg"></svg>
@@ -215,7 +221,7 @@
         let g1Height = 500;
         let g2Height = g1Height;
         let g1Width = 450;
-        let g2Width = 450;
+        let g2Width = g1Width * 1.1; // Default ratio 1.1
 
         let maxTs = 5
         let tsHeight = g2Height - (maxTs - 1) * hPad;
@@ -986,6 +992,21 @@
                 // Update SVG viewBox
                 if (svg) svg.attr('viewBox', `0 0 ${width} ${height}`);
 
+                // Update container aspect ratio to match
+                // We target the .card (parent) to force it to expand its width based on the fixed height (95vh)
+                const card = document.querySelector('.card');
+                if (card) {
+                    // Calculation: Ratio = width / height
+                    // Adding a small buffer or checking if header height needs accounting
+                    // But effectively, if we want the WHOLE card to match the aspect ratio of the visual + header...
+                    // The visual is 'width' x 'height'. Header is fixed pixels (~55px).
+                    // Refined approach: Set aspect-ratio of the card to roughly match the visual, 
+                    // or better: let the aspect-ratio drive the width.
+                    // We simply set the aspect ratio of the card to match the visual's ratio.
+                    // Since height is fixed (95vh), width will become 95vh * ratio.
+                    card.style.aspectRatio = `${width} / ${height}`;
+                }
+
                 // Update g2 position
                 if (g2) {
                     g2.attr('transform', `translate(${margin.left + pad + g1Width}, ${margin.top})`)
@@ -997,6 +1018,13 @@
                     drawTsList();
                 }
             });
+
+            // Trigger initial aspect ratio set
+            const initialWidth = g1Width + pad + (g1Width * 1.1) + margin.left + margin.right;
+            const card = document.querySelector('.card');
+            if (card) {
+                card.style.aspectRatio = `${initialWidth} / ${height}`;
+            }
         });
 
     </script>
